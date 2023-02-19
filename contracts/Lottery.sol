@@ -50,7 +50,7 @@ contract Lottery {
         lotteryHistory[lotteryId] = players[index];
         lotteryId++;
         //다른 컨트랙트와 인터렉션하기전에 모든 상태값을 변경하는 습관 들이기(무한 call)
-        //리엔트랜시 방지(공격자 컨트랙트(EOA가 아니라 다른 컨트랙트를 일부러) 악의적 공격 방지)
+        //re-entrancy attack 방지(공격자 컨트랙트(EOA가 아니라 다른 컨트랙트를 일부러) 악의적 공격 방지)
         (bool success, ) = players[index].call{value: address(this).balance}(""); //우승자에게 이더 보내기(요즘 가장 많이 사용하는 방식)
         require(success, "Failed to send Ether");
 
