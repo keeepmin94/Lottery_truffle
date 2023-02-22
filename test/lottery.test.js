@@ -1,6 +1,6 @@
 const Lottery = artifacts.require("Lottery");
 const should = require("chai").should();
-const { expect } = require("chai");
+const { expect, assert } = require("chai");
 const truffleAssert = require("truffle-assertions");
 
 //contract는 async 못씀(제공X)
@@ -130,6 +130,117 @@ contract("Lottery", (accounts) => {
           .toBN(account3ETHBal_aft)
           .sub(web3.utils.toBN(account3ETHBal_bef))}`
       );
+    });
+
+    it.skip("Calculate winner - getRandomNumber", async () => {
+      const lotteryId = await lottery.lotteryId();
+
+      const winner = await lottery.lotteryHistory(lotteryId - 1);
+
+      const randomNum = await lottery.getRandomNumber();
+      console.log(`randomNum`, randomNum);
+
+      const blockNumber = await web3.eth.getBlockNumber();
+      console.log(`blockNumber: ${blockNumber}`);
+
+      const currentBlock = await web3.eth.getBlock(blockNumber);
+      console.log(`current block:`, currentBlock);
+
+      const calculatedRandomNum = web3.utils
+        .toBN(
+          web3.utils.keccak256(
+            web3.utils.encodePacked(
+              { value: await lottery.owner(), type: "address" },
+              { value: currentBlock.timestamp, type: "uint256" }
+            )
+          )
+        )
+        .toString();
+      console.log(`calculatedRandomNum:`, calculatedRandomNum);
+      assert.equal(randomNum, calculatedRandomNum);
+
+      const calculatedWinnerIndex = web3.utils
+        .toBN(calculatedRandomNum)
+        .mod(web3.utils.toBN(3))
+        .toString();
+      console.log(`calculated winner index:${calculatedWinnerIndex}`);
+
+      assert.equal(winner, accounts[Number(calculatedWinnerIndex) + 1]);
+    });
+
+    it.skip("Calculate winner - getRandomNumberV2", async () => {
+      const lotteryId = await lottery.lotteryId();
+
+      const winner = await lottery.lotteryHistory(lotteryId - 1);
+
+      const randomNum = await lottery.getRandomNumber();
+      console.log(`randomNum`, randomNum);
+
+      const blockNumber = await web3.eth.getBlockNumber();
+      console.log(`blockNumber: ${blockNumber}`);
+
+      const currentBlock = await web3.eth.getBlock(blockNumber);
+      console.log(`current block:`, currentBlock);
+
+      const calculatedRandomNum = web3.utils
+        .toBN(
+          web3.utils.keccak256(
+            web3.utils.encodePacked(
+              { value: currentBlock.difficulty, type: "uint256" },
+              { value: currentBlock.timestamp, type: "uint256" },
+              {
+                value: [accounts[1], accounts[2], accounts[3]],
+                type: "address[]",
+              }
+            )
+          )
+        )
+        .toString();
+      console.log(`calculatedRandomNum:`, calculatedRandomNum);
+
+      const calculatedWinnerIndex = web3.utils
+        .toBN(calculatedRandomNum)
+        .mod(web3.utils.toBN(3))
+        .toString();
+      console.log(`calculated winner index:${calculatedWinnerIndex}`);
+
+      assert.equal(winner, accounts[Number(calculatedWinnerIndex) + 1]);
+    });
+
+    it("Calculate winner - getRandomNumberV3", async () => {
+      const lotteryId = await lottery.lotteryId();
+
+      const winner = await lottery.lotteryHistory(lotteryId - 1);
+
+      const randomNum = await lottery.getRandomNumberV3();
+      console.log(`randomNum`, randomNum);
+
+      const blockNumber = await web3.eth.getBlockNumber();
+      console.log(`blockNumber: ${blockNumber}`);
+
+      const currentBlock = await web3.eth.getBlock(blockNumber);
+      console.log(`current block:`, currentBlock);
+
+      const calculatedRandomNum = web3.utils
+        .toBN(
+          web3.utils.keccak256(
+            web3.utils.encodePacked(
+              { value: currentBlock.parentHash, type: "bytes32" },
+              { value: currentBlock.timestamp, type: "uint256" }
+            )
+          )
+        )
+        .toString();
+      console.log(`calculatedRandomNum:`, calculatedRandomNum);
+      assert.equal(randomNum, calculatedRandomNum);
+
+      const calculatedWinnerIndex = web3.utils
+        .toBN(calculatedRandomNum)
+        .mod(web3.utils.toBN(3))
+        .toString();
+      console.log(`calculated winner index:${calculatedWinnerIndex}`);
+
+      assert.equal(winner, accounts[Number(calculatedWinnerIndex) + 1]);
     });
   });
 });
