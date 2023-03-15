@@ -29,8 +29,12 @@
 - 참여자는 commit 기간 동안 secret 값을 생성 후 이를 해시하여 commit 한다.
 - commit 기간이 끝나면, 공개(reveal) 기간동안 secret 값을 공개하며, 공개된 secret 값을 통해 seed 값이 계속 업데이트된다.
 - 공개 기간이 끝나면, seed 값이 완성되는데 이는 안전한 랜덤값이다.
-
-
+---
+## Test 
+### Lottery 
+![lotteryGif](https://user-images.githubusercontent.com/47639565/225235700-00f8d7e7-76fd-43e3-9861-7c262a172c4b.gif)
+### CommitRevealLottery
+![commitLotteryGif](https://user-images.githubusercontent.com/47639565/225235742-8509bd11-6220-433f-aa60-a1ecf3776c56.gif)
 ---
 ### 개발 환경
 - 언어
@@ -41,6 +45,7 @@
 - Test
     - chai
     - truffle-assertions
+    - Ganache
 
 ---
 ### 서버
